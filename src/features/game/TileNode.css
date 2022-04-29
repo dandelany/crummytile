@@ -1,0 +1,32 @@
+
+.tile-node {
+    /* 38mm x 26.5mm  */
+    text-align: center;
+    border: 1px solid #999;
+    background-color: white;
+    border-radius: 4px;
+    width: 80px;
+    height: 114px;
+    padding: 4px 4px 4px 4px;
+    
+}
+.tile-node h1 {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: bolder;
+    margin: 0;
+
+    font-size: 40pt;
+}
+
+.tile-node-BLK {
+    color: #000;
+}
+.tile-node-RED {
+    color: #d32f2f;
+}
+.tile-node-BLU {
+    color: #1565c0;
+}
+.tile-node-YLW {
+    color: #ffab00;
+}
