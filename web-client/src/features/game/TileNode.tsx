@@ -1,9 +1,9 @@
 import React, {useCallback} from 'react';
-import { Node, Handle } from 'react-flow-renderer';
+import { Node, Handle, NodeProps } from 'react-flow-renderer';
 
 import './TileNode.css';
 
-interface TileNodeProps {
+interface TileNodeProps extends NodeProps {
   data: {
     value: number,
     color: "black" | "blue" | "red" | "yellow"

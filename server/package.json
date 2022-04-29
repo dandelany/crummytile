@@ -1,0 +1,11 @@
+{
+  "name": "crummytile-server",
+  "version": "1.0.0",
+  "description": "crummytile game server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dan Delany <dan.delany@gmail.com>",
+  "license": "MIT"
+}
