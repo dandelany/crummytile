@@ -6,7 +6,7 @@ import ReactFlow, { MiniMap, Controls, Node as FlowNode, Edge as FlowEdge, NodeT
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { gameActions, selectGridTiles } from '../../features/game/gameSlice';
 import { TileNode } from './TileNode';
-
+import './GameGrid.scss'
 
 const nodeTypes = { tileNode: TileNode };
 
@@ -19,16 +19,18 @@ export function GameGrid({}: GameGridProps) {
   const gridTiles = useAppSelector(selectGridTiles);
 
   return (
-    <ReactFlow 
-      nodes={gridTiles}
-      onNodesChange={(changes) => {
-        dispatch(gameActions.handleGridTilesChange(changes));
-      }}
-      defaultEdges={[]}
-      nodeTypes={nodeTypes as any as NodeTypes}
-    >
-      <MiniMap />
-      <Controls />
-    </ReactFlow>
+    <div id="game-grid">
+      <ReactFlow 
+        nodes={gridTiles}
+        onNodesChange={(changes) => {
+          dispatch(gameActions.handleGridTilesChange(changes));
+        }}
+        defaultEdges={[]}
+        nodeTypes={nodeTypes as any as NodeTypes}
+      >
+        <MiniMap />
+        <Controls />
+      </ReactFlow>
+    </div>
   );
 }

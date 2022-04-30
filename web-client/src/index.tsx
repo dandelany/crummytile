@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { GameClientProvider } from './features/game/GameClientProvider';
 import { store } from './app/store';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -12,7 +13,9 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <GameClientProvider>
+        <App />
+      </GameClientProvider>
     </Provider>
   </React.StrictMode>
 );

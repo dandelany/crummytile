@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react';
 import { Node, Handle, NodeProps } from 'react-flow-renderer';
 
-import './TileNode.css';
+import './TileNode.scss';
 
 interface TileNodeProps extends NodeProps {
   data: {

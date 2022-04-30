@@ -1,0 +1,7 @@
+@use '../../variables.scss' as *;
+
+#game-grid {
+  position: absolute;
+  height: calc(100% - $bottom-pane-height);
+  width: 100%;
+}
