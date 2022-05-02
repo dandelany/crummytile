@@ -3,7 +3,7 @@ import { GameClient, getGameClient } from "./GameClient";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {gameActions} from '../../features/game/gameSlice';
 
-const GameClientContext = React.createContext<GameClient | null>(null);
+export const GameClientContext = React.createContext<GameClient | null>(null);
 GameClientContext.displayName = 'GameClientContext';
 
 type GameClientProviderProps = React.PropsWithChildren<{}>;
@@ -12,13 +12,24 @@ export function GameClientProvider(props: GameClientProviderProps) {
   const dispatch = useAppDispatch();
 
   const gameClient = useMemo(
-    () => getGameClient({
-      onConnect: () => dispatch(gameActions.handleConnect()),
-      onDisconnect: () => dispatch(gameActions.handleDisconnect())
-    }),
-    // only once on mount
-    []
+    () => { 
+      const client = getGameClient();
+      if(!Object.keys(client.callbacks).length) {
+        client.attachCallbacks({
+          onConnect: () => dispatch(gameActions.handleConnect()),
+          onDisconnect: () => dispatch(gameActions.handleDisconnect()),
+          onGridTileChanges: (changeMsg) => {
+            dispatch(gameActions.handleSocketGridTilesChange(changeMsg))
+          }
+        })
+      }
+      return client;
+    },
+    [] // only once on mount
   );
+
+  
+  
 
   return (
     <GameClientContext.Provider value={gameClient}>

@@ -1,0 +1,39 @@
+.main-menu {
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  min-width: 30vw;
+  width: 70%;
+  max-width: 40vh;
+  // height: 15vh;
+  z-index: 999;
+  padding: 12px 6px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: flex-start;
+
+  div.logo {
+    font-size: 14vh;
+  }
+  
+  div.button-container {
+    margin: 10px;
+
+    button {
+      cursor: pointer;
+      font-size: max(2.5vh, 11pt);
+    }
+  }
+
+  h1 {
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin-top: 0;
+  }
+}

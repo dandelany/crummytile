@@ -1,6 +1,6 @@
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import {
-  gameActions, selectHand, selectBag, selectConnected, GridTileNode, HandTile
+  gameActions, selectMyHand, selectBag, selectConnected, GridTileNode, HandTile
 } from '../gameSlice';
 
 import "./HandTileItem.scss";

@@ -1,6 +1,6 @@
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import {
-  gameActions, selectHand, selectBag, selectConnected
+  gameActions, selectMyHand, selectBag, selectConnected
 } from '../../../features/game/gameSlice';
 
 import "./HandContainer.scss";
@@ -9,12 +9,12 @@ import { HandTileItem } from './HandTileItem';
 export function HandContainer() {
   // container for the tiles you have in your hand
   const dispatch = useAppDispatch();
-  const hand = useAppSelector(selectHand);
-  const bag = useAppSelector(selectBag);
+  const hand = useAppSelector(selectMyHand);
 
+  if(!hand) return null;
   return (
     <div className="hand-container">
-        {hand.map(tile => <HandTileItem tile={tile} />)}
+        {hand.map(tile => <HandTileItem tile={tile} key={tile.id} />)}
     </div>
   );
 }

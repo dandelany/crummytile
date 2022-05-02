@@ -7,6 +7,24 @@ crummytile
 [x] track connection state in redux
 [x] show connection state in panel
 [x] move controlpanel to own file
-[ ] implement basic hand UI with flexbox
-[ ] reducer for playing a card from hand to grid
-[ ] click tile in hand to play it
+[x] implement basic hand UI with flexbox
+[x] reducer for playing a card from hand to grid
+[x] click tile in hand to play it
+[ ] better placement for tiles when played
+[x] main menu ui - host and join game buttons
+[x] connection state on main menu
+[ ] multiple player hands in game state
+[x] host game endpoint
+[x] join game endpoint
+[x] send and receive tile moves as host
+[x] send and receive tile moves as non-host
+
+[x] shared code between frontend & server
+[x] vscode task for watching & building shared code
+[x] start shared crummytile class
+
+
+first beta game!
+* disappearing tiles
+* rearrange hand
+* 
