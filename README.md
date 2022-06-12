@@ -2,6 +2,8 @@
 
 Open source web app for playing rummikub and other tile/card games
 
+<img width="906" alt="image" src="https://user-images.githubusercontent.com/734221/173209224-e6a09e1b-3014-40d4-b932-712ba9e5a9cf.png">
+
 ## Getting started
 ### Server
 The game server is a Node app serving WebSocket connections, files are in `/server`. 
