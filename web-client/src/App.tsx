@@ -5,16 +5,8 @@ import { MainMenu } from './features/game/MainMenu';
 import { useAppSelector } from './app/hooks';
 import { selectGame } from './features/game/gameSlice';
 
-import { Crummytile } from "crummytile-shared";
-
 
 import './App.scss';
-
-
-const game = new Crummytile({playerCount: 2});
-game.drawTiles(0, 14);
-game.drawTiles(1, 14);
-
 
 
 function App() {

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {
   gameActions, selectMyHand, selectBag, selectConnected
@@ -12,30 +12,18 @@ export function ControlPanel() {
   const bag = useAppSelector(selectBag);
   const connected = useAppSelector(selectConnected);
 
-  // useEffect(() => {
-  //   dispatch(gameActions.initBag());
-  // }, [])
-
   const gameClient = useContext(GameClientContext);
+
+  const handleClickDraw = useCallback(() => {
+    dispatch(gameActions.drawTiles({count: 1}));
+  }, [])
 
   return (
     <div className="control-panel">
-      {/* <button onClick={() => {dispatch(gameActions.initBag())}}>
-          Shuffle
-      </button> */}
-      <div>
-        <button onClick={() => {
-          if(gameClient) {
-            gameClient.hostGame();
-          }
-        }}>Host Game</button>
-      </div>
       <h4>
         {connected ? "Connected" : "Disconnected"}
       </h4>
-      <button onClick={() => {
-        dispatch(gameActions.drawTiles({player: 0, count: 1}))
-      }}>
+      <button onClick={handleClickDraw}>
           Draw Tile
       </button>
       {bag ? 
@@ -44,7 +32,6 @@ export function ControlPanel() {
         </h4>
         : null
       }
-      
     </div>
   );
 }

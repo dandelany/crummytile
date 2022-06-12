@@ -18,17 +18,34 @@ export enum GAME_MODE {
   PLAYING = 'PLAYING'
 }
 
+// actions the player can take
+// todo move these to the API?
+export enum GameActionType {
+  Ready = "Ready",
+  NotReady = "NotReady",
+  DrawTiles = "DrawTiles",
+  PlayTile = "PlayTile",
+  MoveTiles = "MoveTiles"
+}
+export type BaseGameAction<AT extends GameActionType, T> = {
+  type: AT,
+  payload: T
+}
+export type ReadyGameAction = BaseGameAction<GameActionType.Ready, {
+  playerIndex: number
+}>
+////
 
 export interface GameTileData {
   value: number;
   color: TILE_COLOR;
 }
-interface GameTile {
+export interface GameTile {
   type: "tileNode",
   id: string,
   data: GameTileData
 }
-interface GameGridTile extends GameTile {
+export interface GameGridTile extends GameTile {
   position: {
     x: number,
     y: number
@@ -36,7 +53,7 @@ interface GameGridTile extends GameTile {
 }
 type TileBag = GameTile[];
 
-
+// the entire state of the game
 export interface GameState {
   id: string;
   mode: GAME_MODE;
@@ -45,10 +62,16 @@ export interface GameState {
   gridTiles: GameGridTile[];
   playerCount: number;
 }
+// subset of game state visible to a single player
+export interface VisibleGameState extends Omit<GameState, "bag" | "hands"> {
+  hand: GameTile[],
+  bagCount: number
+}
 export interface GameOptions {
   playerCount?: number;
   id?: string;
 }
+
 export class Crummytile {
   options: GameOptions;
   state: GameState;
@@ -128,7 +151,16 @@ export class Crummytile {
     gridTiles.push(gridTile);
     return this.state;
   }
+  
   getState(): GameState {
+    return this.state;
+  }
+  removeTilesFromBag(tileIds: string[]): GameState {
+    // todo remove this later?
+    tileIds.forEach(tileId => {
+      const tileIndex = findIndex(this.state.bag, tile => tile.id === tileId);
+      if(tileIndex >= 0) this.state.bag.splice(tileIndex, 1);
+    });
     return this.state;
   }
 }

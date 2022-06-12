@@ -17,6 +17,8 @@ type GameInfo = {
 
 let game = null;
 
+let gameInfo = null;
+
 function getTileChangeRoomName(myGame) {
   return `${myGame.id}-tile`;
 }
@@ -30,6 +32,10 @@ io.on("connection", (socket) => {
   socket.on('game/list', (callback) => {
     callback([game]);
   });
+
+  socket.on('game/create', () => {
+    
+  })
 
   socket.on("game/host", (user, callback) => {
     if(!game) {
@@ -85,6 +91,21 @@ io.on("connection", (socket) => {
     if(myGameInfo) {
       const room = getTileChangeRoomName(myGameInfo);
       io.to(room).emit("game/tile-changes-room", changeMsg);
+    }
+  });
+
+  socket.on("game/draw-tiles", (drawMsg) => {
+    console.log(`got draw tile ${JSON.stringify(drawMsg)}`);
+    if(myGameInfo) {
+      const room = getTileChangeRoomName(myGameInfo);
+      io.to(room).emit("game/draw-tiles-room", drawMsg);
+    }
+  });
+  socket.on("game/play-tile", (playMsg) => {
+    console.log(`got play tile ${JSON.stringify(playMsg)}`);
+    if(myGameInfo) {
+      const room = getTileChangeRoomName(myGameInfo);
+      io.to(room).emit("game/play-tile-room", playMsg);
     }
   });
 

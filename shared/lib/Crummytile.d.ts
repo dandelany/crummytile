@@ -8,16 +8,30 @@ export declare enum GAME_MODE {
     SETUP = "SETUP",
     PLAYING = "PLAYING"
 }
+export declare enum GameActionType {
+    Ready = "Ready",
+    NotReady = "NotReady",
+    DrawTiles = "DrawTiles",
+    PlayTile = "PlayTile",
+    MoveTiles = "MoveTiles"
+}
+export declare type BaseGameAction<AT extends GameActionType, T> = {
+    type: AT;
+    payload: T;
+};
+export declare type ReadyGameAction = BaseGameAction<GameActionType.Ready, {
+    playerIndex: number;
+}>;
 export interface GameTileData {
     value: number;
     color: TILE_COLOR;
 }
-interface GameTile {
+export interface GameTile {
     type: "tileNode";
     id: string;
     data: GameTileData;
 }
-interface GameGridTile extends GameTile {
+export interface GameGridTile extends GameTile {
     position: {
         x: number;
         y: number;
@@ -32,6 +46,10 @@ export interface GameState {
     gridTiles: GameGridTile[];
     playerCount: number;
 }
+export interface VisibleGameState extends Omit<GameState, "bag" | "hands"> {
+    hand: GameTile[];
+    bagCount: number;
+}
 export interface GameOptions {
     playerCount?: number;
     id?: string;
@@ -44,5 +62,6 @@ export declare class Crummytile {
     drawTiles(playerIndex: number, count: number): GameState;
     playTile(playerIndex: number, tileId: string): GameState;
     getState(): GameState;
+    removeTilesFromBag(tileIds: string[]): GameState;
 }
 export {};

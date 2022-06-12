@@ -20,6 +20,12 @@ export function GameClientProvider(props: GameClientProviderProps) {
           onDisconnect: () => dispatch(gameActions.handleDisconnect()),
           onGridTileChanges: (changeMsg) => {
             dispatch(gameActions.handleSocketGridTilesChange(changeMsg))
+          },
+          onDrawTiles: (drawMsg) => {
+            dispatch(gameActions.handleSocketDrawTiles(drawMsg))
+          },
+          onPlayTile: (playMsg) => {
+            dispatch(gameActions.handleSocketPlayTile(playMsg))
           }
         })
       }
@@ -27,10 +33,7 @@ export function GameClientProvider(props: GameClientProviderProps) {
     },
     [] // only once on mount
   );
-
   
-  
-
   return (
     <GameClientContext.Provider value={gameClient}>
       {props.children}

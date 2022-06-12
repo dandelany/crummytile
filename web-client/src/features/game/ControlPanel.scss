@@ -1,8 +1,5 @@
 .control-panel {
-  /* position: fixed; */
-  /* top: 40px; */
-  /* right: 40px; */
-  width: 220px;
+  // width: 220px;
   margin: 12px;
   -webkit-margin-collapse: collapse;
   /* height: 300px; */
@@ -10,4 +7,9 @@
   background-color: white;
   border-radius: 2px;
   z-index: 999;
+
+  flex-basis: 200px;
+  min-width: 200px;
+  flex-grow: 1;
+  flex-shrink: 1;
 }

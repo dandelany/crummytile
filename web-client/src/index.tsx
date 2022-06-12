@@ -6,6 +6,7 @@ import { store } from './app/store';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
+import { ReactFlowProvider } from 'react-flow-renderer';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -13,9 +14,11 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <GameClientProvider>
-        <App />
-      </GameClientProvider>
+      <ReactFlowProvider>
+        <GameClientProvider>
+          <App />
+        </GameClientProvider>
+      </ReactFlowProvider>
     </Provider>
   </React.StrictMode>
 );

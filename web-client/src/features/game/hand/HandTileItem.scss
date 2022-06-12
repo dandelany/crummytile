@@ -1,10 +1,8 @@
 @use '../../../variables.scss' as *;
 
-.hand-tile {
-  background-color: $tile-white-color;
-  width: 80px;
 
-}
+
+$scale: 0.15;
 
 .hand-tile {
   /* 38mm x 26.5mm  */
@@ -13,8 +11,11 @@
   background-color: $tile-white-color;
   text-shadow: 0px 1px white, 0px -1px 1px #eee;
   border-radius: 4px;
-  width: (80px / 1.5);
-  height: (114px / 1.5);
+  // width: (80px / 1.5);
+  // height: (114px / 1.5);
+  width: (40vh * $scale);
+  height: (57vh * $scale);
+
   padding: 4px 4px 4px 4px;
   margin: 2px;
   user-select: none;
@@ -28,7 +29,8 @@
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: bolder;
     margin: 0;
-    font-size: 23pt;
+    // font-size: 23pt;
+    font-size: (24vh * $scale);
 
     &.tile-value-BLK {
       color: $tile-black-color;

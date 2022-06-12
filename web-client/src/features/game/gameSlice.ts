@@ -1,17 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {current} from "immer";
-import range from "lodash/range";
-import random from "lodash/random";
-import shuffle from 'lodash/shuffle';
-import times from 'lodash/times';
-import findIndex from 'lodash/findIndex';
 import { Node as FlowNode, Edge as FlowEdge, NodeChange, applyNodeChanges } from 'react-flow-renderer';
 
 import { RootState, AppThunk } from '../../app/store';
-import { GameClient, GameResponseSuccess, GridTileChangesMessage } from './GameClient';
-import { cloneDeep, find } from 'lodash';
+import { DrawTilesMessage, GameClient, GameResponseSuccess, GridTileChangesMessage, PlayTileMessage } from './GameClient';
+import { cloneDeep, find, pullAllBy } from 'lodash';
 
 import { Crummytile } from 'crummytile-shared';
+import { GameGridTile, GameState } from 'crummytile-shared/lib/Crummytile';
 
 
 enum TILE_COLOR {
@@ -45,29 +41,15 @@ export type GridTileNode = FlowNode<GridTileNodeData>;
 export type HandTile = Omit<GridTileNode, 'position'>
 
 
-export interface GameState {
-  bag: TileBag;
-  // hand: GameTile[];
-  hands: HandTile[][];
-  gridTiles: GridTileNode[];
-  playerIndex: number;
-  id: string;
-}
-
 export interface GameSliceState {
   // status: 'idle' | 'loading' | 'failed';
-  // bag: TileBag;
-  // hand: HandTile[];
-  // gridTiles: GridTileNode[];
   connected: boolean;
   errMsg?: string;
   game?: GameState;
+  playerIndex?: number;
 }
 const initialState: GameSliceState = {
   // status: 'idle',
-  // bag: [],
-  // hand: [],
-  // gridTiles: [],
   connected: false
 };
 
@@ -110,130 +92,77 @@ export const gameSlice = createSlice({
     // which detects changes to a "draft state" and produces a brand new
     // immutable state based off those changes
   reducers: {
-    // initBag: (state) => {
-    //   if(!state.game) throw Error("no game exists");
-
-    //   console.log('initializing bag');
-    //   const bag: TileBag = [];
-    //   Object.values(TILE_COPIES).forEach(tileCopy => {
-    //     Object.values(TILE_COLOR).forEach(color => {
-    //       range(1, 14).forEach((value: number) => {
-    //         const tileId = `${color}-${value}-${tileCopy}`;
-    //         // bag[tileId] = true;
-    //         bag.push(tileId);
-    //       })
-    //     });
-    //   });
-    //   // jokers
-    //   bag.push(`${TILE_COLOR.BLACK}-999-A`);
-    //   bag.push(`${TILE_COLOR.RED}-999-B`);
-
-    //   // shuffle the tiles in random order
-    //   const shuffledBag = shuffle(bag);
-    //   console.log(shuffledBag);
-      
-    //   state.game.bag = shuffledBag;
-    // },
-
-    drawTiles: (state, action: PayloadAction<{player: number, count: number}>) => {
-      if(!gameInstance) throw Error("no game exists");
-      const {player, count} = action.payload;
-      const newState = cloneDeep(gameInstance.drawTiles(player, count));
+    drawTiles: (state, action: PayloadAction<{count: number}>) => {
+      if(!gameInstance || state.playerIndex === undefined) throw Error("no game exists");
+      const {count} = action.payload;
+      const {playerIndex} = state;
+      const newState = cloneDeep(gameInstance.drawTiles(playerIndex, count));
       Object.assign(state.game, {
         bag: newState.bag,
         hands: newState.hands
       });
     },
-    drawTilesOld: (state, action: PayloadAction<{player: number, count: number}>) => {
-      if(!state.game) throw Error("no game exists");
-      const game = state.game;
-
-      const {payload} = action;
-      const {player, count} = payload;
-      // const {bag, hands}
-      
-      if(count > state.game.bag.length) {
-        throw Error("not enough tiles in bag");
-      }
-      times(count, () => {
-        const tileId = game.bag.pop();
-        console.log(tileId);
-        if(tileId === undefined) return;
-        const [color, valueStr] = tileId.split('-');
-        const value = parseInt(valueStr);
-
-        const handTile: HandTile = {
-          id: tileId,
-          data: {
-            color: color as TILE_COLOR,
-            value
-          },
-          type: 'tileNode'
-        };
-        const {playerIndex} = game;
-        if(playerIndex >= game.hands.length) {
-          throw Error(`invalid player index ${playerIndex}`)
-        }
-
-        game.hands[playerIndex].push(handTile);
-      })
-
-      console.log(current(state));
-    },
+    
     playTile: (state, action: PayloadAction<{tileId: string}>) => {
       if(!state.game) throw Error("no game exists");
-      const {game} = state;
+      if(!gameInstance || state.playerIndex === undefined) throw Error("no game exists");
       const {tileId} = action.payload;
-
-      const myHand = game.hands[game.playerIndex];
-      const handTileIndex = findIndex(myHand, (tile) => tile.id === tileId)
-      if(handTileIndex < 0) throw Error(`couldn't find tile ${tileId} in hand`);
-      const handTile = myHand[handTileIndex];
-
-      const gridTile: GridTileNode = {
-        ...handTile,
-        position: {
-          x: random(0, 800),
-          y: random(0, 400)
-        }
-      };
-      // remove tile from hand
-      myHand.splice(handTileIndex, 1);
-      // add it to the grid
-      game.gridTiles.push(gridTile);
-    },
-    updateGridTiles: (state, action: PayloadAction<GridTileNode[]>) => {
-      if(!state.game) return;
-      state.game.gridTiles = action.payload;
+      const newState = cloneDeep(gameInstance.playTile(state.playerIndex, tileId));
+      Object.assign(state.game, {
+        hands: newState.hands,
+        gridTiles: newState.gridTiles
+      });
     },
     
+    handleSocketDrawTiles: (state, action: PayloadAction<DrawTilesMessage>) => {
+      // todo improve
+      const {payload} = action;
+      console.log("socket draw tiles", payload);
+      console.log(state.playerIndex);
+      if(state.game && gameInstance && state.playerIndex !== payload.playerIndex) {
+        console.log("handling other player draw tiles", payload);
+        let playerHand = payload.hand;
+        gameInstance.removeTilesFromBag(playerHand.map(tile => tile.id));
+        gameInstance.state.hands[payload.playerIndex] = payload.hand;
+        const gameState = gameInstance.getState()
+        state.game.bag = cloneDeep(gameState.bag);
+      }
+      
+    },
+    handleSocketPlayTile: (state, action: PayloadAction<PlayTileMessage>) => {
+      // todo improve
+      const {payload} = action;
+      console.log("socket play tile", action.payload);
+      if(state.game && gameInstance && state.playerIndex !== payload.playerIndex) {
+        gameInstance.playTile(payload.playerIndex, payload.tileId);
+        state.game.gridTiles = cloneDeep(gameInstance.getState().gridTiles);
+      }
+    },
+
+
     handleHostGameSuccess: (state, action: PayloadAction<GameResponseSuccess>) => {
       const {payload} = action;
 
       gameInstance = new Crummytile({playerCount: 2, id: payload.id});
+      state.playerIndex = payload.playerIndex;
 
-      state.game = {
-        bag: [],
-        // todo how to decide how many players?
-        hands: [[], []],
-        gridTiles: [],
-        playerIndex: payload.playerIndex,
-        id: payload.id
-      }
+      state.game = cloneDeep(gameInstance.getState());
+      // state.game = {
+      //   bag: [],
+      //   // todo how to decide how many players?
+      //   hands: [[], []],
+      //   gridTiles: [],
+      //   playerIndex: payload.playerIndex,
+      //   id: payload.id
+      // }
     },
     handleJoinGameSuccess: (state, action: PayloadAction<GameResponseSuccess>) => {
       const {payload} = action;
 
       gameInstance = new Crummytile({playerCount: 2, id: payload.id});
 
-      state.game = {
-        bag: [],
-        // todo how to decide how many players?
-        hands: [[], []],
-        gridTiles: [],
-        playerIndex: payload.playerIndex,
-        id: payload.id
-      }
+      state.playerIndex = payload.playerIndex;
+      state.game = cloneDeep(gameInstance.getState());
     },
     handleJoinGameError: (state, action: PayloadAction<string>) => {
       const errMsg = action.payload;
@@ -241,47 +170,24 @@ export const gameSlice = createSlice({
     },
 
     handleSocketGridTilesChange: (state, action: PayloadAction<GridTileChangesMessage>) => {
-      if(!state.game) return;
+      if(!state.game || !gameInstance) return;
       const {playerIndex, changes} = action.payload;
 
-      if(playerIndex !== state.game.playerIndex) {
-        console.log('got changes from someone else!!');
-        
-        // TEMP HACK TO HACK IN TILES THAT DON'T EXIST - TODO FIX ME!!
-        changes.forEach((change) => {
-          const tileId = (change as {id: string}).id;
-          const {gridTiles} = state.game as GameState;
-          const gridTile = find(gridTiles, tile => tile.id === tileId);
-
-          if(!gridTile) {
-            console.log('hacking in the tile', tileId);
-            if(tileId === undefined) return;
-            const [color, valueStr] = tileId.split('-');
-            const value = parseInt(valueStr);
-
-            const newGridTile: GridTileNode = {
-              id: tileId,
-              data: {
-                color: color as TILE_COLOR,
-                value
-              },
-              position: {x: 0, y: 0},
-              type: 'tileNode'
-            };
-            gridTiles.push(newGridTile);
-          }
-        })
-
+      if(playerIndex !== state.playerIndex) {
+        console.log('got grid tile changes from another player');
         const newTiles = applyNodeChanges(changes, state.game.gridTiles);
-        state.game.gridTiles = newTiles;
+        // todo fix this hack!!
+        gameInstance.state.gridTiles = JSON.parse(JSON.stringify(newTiles)) as GameGridTile[];
+        state.game.gridTiles = newTiles as GameGridTile[]; // todo ??
       }
     },
     handleGridTilesChange: (state, action: PayloadAction<NodeChange[]>) => {
-      if(!state.game) return;
+      if(!state.game || !gameInstance) return;
       const changes = action.payload;
       const newTiles = applyNodeChanges(changes, state.game.gridTiles);
-      state.game.gridTiles = newTiles;
-  //     // console.log('newTiles', JSON.stringify(newTiles));
+      // todo fix this hack!!
+      gameInstance.state.gridTiles = JSON.parse(JSON.stringify(newTiles)) as GameGridTile[];
+      state.game.gridTiles = newTiles as GameGridTile[]; // todo ??
     },
     handleConnect: (state) => {
       state.connected = true;
@@ -311,10 +217,12 @@ export const gameActions = gameSlice.actions;
 
 export const selectGame = (state: RootState) => state.game.game;
 export const selectBag = (state: RootState) => state.game.game?.bag;
+export const selectPlayerIndex =  (state: RootState) => state.game.playerIndex;
 export const selectMyHand = (state: RootState) => {
   const game = state.game.game;
-  if(!game) return undefined;
-  return game.hands[game.playerIndex];
+  const playerIndex = state.game.playerIndex;
+  if(!game || playerIndex === undefined) return undefined;
+  return game.hands[playerIndex];
 };
 export const selectGridTiles = (state: RootState) => state.game.game?.gridTiles;
 export const selectConnected = (state: RootState) => state.game.connected;

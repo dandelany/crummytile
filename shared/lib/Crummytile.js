@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Crummytile = exports.GAME_MODE = exports.TILE_COLOR = void 0;
+exports.Crummytile = exports.GameActionType = exports.GAME_MODE = exports.TILE_COLOR = void 0;
 const range_1 = __importDefault(require("lodash/range"));
 const random_1 = __importDefault(require("lodash/random"));
 const shuffle_1 = __importDefault(require("lodash/shuffle"));
@@ -24,6 +24,16 @@ var GAME_MODE;
     GAME_MODE["SETUP"] = "SETUP";
     GAME_MODE["PLAYING"] = "PLAYING";
 })(GAME_MODE = exports.GAME_MODE || (exports.GAME_MODE = {}));
+// actions the player can take
+// todo move these to the API?
+var GameActionType;
+(function (GameActionType) {
+    GameActionType["Ready"] = "Ready";
+    GameActionType["NotReady"] = "NotReady";
+    GameActionType["DrawTiles"] = "DrawTiles";
+    GameActionType["PlayTile"] = "PlayTile";
+    GameActionType["MoveTiles"] = "MoveTiles";
+})(GameActionType = exports.GameActionType || (exports.GameActionType = {}));
 class Crummytile {
     constructor(options = {}) {
         console.log("Welcome to Crummytile!");
@@ -97,6 +107,15 @@ class Crummytile {
         return this.state;
     }
     getState() {
+        return this.state;
+    }
+    removeTilesFromBag(tileIds) {
+        // todo remove this later?
+        tileIds.forEach(tileId => {
+            const tileIndex = (0, findIndex_1.default)(this.state.bag, tile => tile.id === tileId);
+            if (tileIndex >= 0)
+                this.state.bag.splice(tileIndex, 1);
+        });
         return this.state;
     }
 }

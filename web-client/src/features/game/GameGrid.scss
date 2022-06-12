@@ -2,6 +2,11 @@
 
 #game-grid {
   position: absolute;
-  height: calc(100% - $bottom-pane-height);
+  // height: calc(100% - $bottom-pane-height);
+  height: 100%;
   width: 100%;
+
+  .react-flow__renderer  {
+    // background-image: url('../../images/plaid_small.jpg');
+  }
 }

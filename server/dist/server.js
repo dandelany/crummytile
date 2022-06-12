@@ -64,6 +64,20 @@ io.on("connection", (socket) => {
             io.to(room).emit("game/tile-changes-room", changeMsg);
         }
     });
+    socket.on("game/draw-tiles", (drawMsg) => {
+        console.log(`got draw tile ${JSON.stringify(drawMsg)}`);
+        if (myGameInfo) {
+            const room = getTileChangeRoomName(myGameInfo);
+            io.to(room).emit("game/draw-tiles-room", drawMsg);
+        }
+    });
+    socket.on("game/play-tile", (playMsg) => {
+        console.log(`got play tile ${JSON.stringify(playMsg)}`);
+        if (myGameInfo) {
+            const room = getTileChangeRoomName(myGameInfo);
+            io.to(room).emit("game/play-tile-room", playMsg);
+        }
+    });
     // socket.on('disconnect', () => {
     //   // if socket is hosting the game
     //   // send "host disconnected" event to all players

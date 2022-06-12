@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import { Node, Handle, NodeProps } from 'react-flow-renderer';
+import { Node, Handle, NodeProps, useStore } from 'react-flow-renderer';
 
 import './TileNode.scss';
 

@@ -1,5 +1,6 @@
 import { NodeChange } from "react-flow-renderer";
 import { io, Socket } from "socket.io-client";
+import { GameGridTile, GameTile } from "crummytile-shared/lib/Crummytile";
 
 const {hostname} = window.location;
 const wsPort = 5601
@@ -9,11 +10,23 @@ export type GridTileChangesMessage = {
   playerIndex: number,
   changes: NodeChange[]
 }
+export type DrawTilesMessage = {
+  playerIndex: number,
+  hand: GameTile[]
+}
+export type PlayTileMessage = {
+  playerIndex: number,
+  tileId: string,
+  gridTiles: GameGridTile[]
+}
+
 
 type GameClientCallbacks = {
   onConnect?: () => void,
   onDisconnect?: () => void,
-  onGridTileChanges?: (changeMsg: GridTileChangesMessage) => void
+  onGridTileChanges?: (changeMsg: GridTileChangesMessage) => void,
+  onDrawTiles?: (drawMsg: DrawTilesMessage) => void,
+  onPlayTile?: (playMsg: PlayTileMessage) => void
 }
 
 export interface GameResponseSuccess {
@@ -78,7 +91,13 @@ export class GameClient {
             console.log('got changes from room', changes);
             this.handleGridTileChanges(changes);
           })
-          
+          this.socket.on("game/draw-tiles-room", (drawMsg: DrawTilesMessage) => {
+            if(this.callbacks.onDrawTiles) this.callbacks.onDrawTiles(drawMsg);
+          });
+          this.socket.on("game/play-tile-room", (playMsg: PlayTileMessage) => {
+            if(this.callbacks.onPlayTile) this.callbacks.onPlayTile(playMsg);
+          });
+
           resolve(response);
         }
       });
@@ -97,10 +116,19 @@ export class GameClient {
 
           const gameId = response.id;
 
+          // todo don't repeat this!!!
+
           this.socket.on("game/tile-changes-room", (changes: any) => {
             console.log('got changes from room', changes);
             this.handleGridTileChanges(changes);
           });
+          this.socket.on("game/draw-tiles-room", (drawMsg: DrawTilesMessage) => {
+            if(this.callbacks.onDrawTiles) this.callbacks.onDrawTiles(drawMsg);
+          });
+          this.socket.on("game/play-tile-room", (playMsg: PlayTileMessage) => {
+            if(this.callbacks.onPlayTile) this.callbacks.onPlayTile(playMsg);
+          });
+
           resolve(response);
         }
       });
@@ -110,6 +138,12 @@ export class GameClient {
 
   sendGridTileChanges(changeMsg: GridTileChangesMessage) {
     this.socket.emit('game/tile-changes', changeMsg);
+  }
+  sendDrawTile(drawMsg: DrawTilesMessage) {
+    this.socket.emit('game/draw-tiles', drawMsg);
+  }
+  sendPlayTile(playMsg: PlayTileMessage) {
+    this.socket.emit('game/play-tile', playMsg);
   }
 }
 

@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
+import { GameClientContext } from '../GameClientProvider';
 import {
   gameActions, selectMyHand, selectBag, selectConnected, GridTileNode, HandTile
 } from '../gameSlice';
@@ -15,6 +17,9 @@ export function HandTileItem(props: HandTileItemProps) {
   const {value} = tile.data;
   const isJoker = value === 999;
   const displayValue = isJoker ? "😂" : value;
+
+  const gameClient = useContext(GameClientContext);
+
 
   return (
     <div className="hand-tile" onClick={() => {

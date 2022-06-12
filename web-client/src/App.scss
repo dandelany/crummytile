@@ -36,14 +36,14 @@ p {
 .bottom-pane {
   position: fixed;
   bottom: 0;
-  height: $bottom-pane-height;
+  // height: $bottom-pane-height;
   width: 100%;
   z-index: 99;
-  background-color: $bottom-pane-color;
+  // background-color: $bottom-pane-color;
 
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-content: center;
+  align-content: end;
 }
